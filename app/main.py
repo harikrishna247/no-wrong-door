@@ -11,7 +11,7 @@ resident_index = ResidentIndexAdapter()
 benefits_register = BenefitsRegisterAdapter()
 
 
-@app.get("/resident/{resident_id}")
+@app.get("/resident/{resident_id:path}")
 async def get_resident(resident_id: str):
     results = await asyncio.gather(
         resident_index.get(resident_id),

@@ -49,14 +49,17 @@ class BenefitsRegisterAdapter(SourceAdapter):
 
     def _parse_xml(self, xml_text: str) -> dict:
         root = ElementTree.fromstring(xml_text)
+        record = root.find("Record")
+        if record is None:
+            record = root 
         return {
-            "ref": root.findtext("Ref"),
-            "name": root.findtext("n"),
-            "born": root.findtext("Born"),
-            "addr": root.findtext("Addr"),
-            "town": root.findtext("Town"),
-            "benefit_code": root.findtext("BenefitCode"),
-            "review_due": root.findtext("ReviewDue"),
+            "ref": record.findtext("Ref"),
+            "name": record.findtext("Name"),
+            "born": record.findtext("Born"),
+            "addr": record.findtext("Addr"),
+            "town": record.findtext("Town"),
+            "benefit_code": record.findtext("BenefitCode"),
+            "review_due": record.findtext("ReviewDue"),
         }
 
     def _normalize(self, record: dict) -> dict:
