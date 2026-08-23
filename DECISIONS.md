@@ -52,3 +52,28 @@ It's also practically useful: a caller wouldn't know an exact id like R-10234
 ahead of time, so a listing/browse endpoint isn't just there to check a box.
 
 ---
+
+## Day 2 — Surprise challenge: Benefits Register degraded to 40% failure
+
+**What changed:** The Benefits Register now fails ~40% of the time (up from 15%),
+permanently. Announced as the Day 2 surprise.
+
+**Chosen:** Added a last-known-good cache to BenefitsRegisterAdapter. The first
+successful fetch for a ref is remembered in memory. If a later call fails (even
+after the retry), the cached data is returned with a new "stale" status and a
+reason, instead of "unavailable".
+
+**Why:** At 40%, retry-once alone still fails visibly about 16% of the time
+(0.4 x 0.4) — up from ~2% before. That's frequent enough to hit during a live
+demo. Caching turns a real failure into data the system already knows, instead
+of just retrying harder.
+
+**Not changed:** The REST adapter (resident_index) — this source wasn't
+affected, and per the Day One adapter-boundary decision, one source failing
+shouldn't require changes to an unrelated one. Didn't add more retries either,
+since each retry costs 0.7-2.4s and the cache was the more honest fix.
+
+**Limitation:** The cache is in-memory and per-process — it's empty on a fresh
+start, so a resident being looked up for the very first time while the source
+is down still gets "unavailable". With more time, this would be worth
+persisting.
