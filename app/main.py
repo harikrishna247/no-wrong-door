@@ -29,6 +29,11 @@ async def get_resident(resident_id: str):
         },
     }
 
+@app.get("/residents")
+async def list_residents():
+    result = await resident_index.list_all()
+    return result
+
 
 def _to_dict(result) -> dict:
     if isinstance(result, Exception):
